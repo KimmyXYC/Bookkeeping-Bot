@@ -41,7 +41,7 @@ async def create(bot, message: types.Message, db):
     id_list = db.get("index")
     if id_list is None:
         id_list = {"id": []}
-    if user_id not in id_list["id"]:
+    if int(user_id) not in id_list["id"]:
         await bot.reply_to(message, f"用户 {user_id} 未绑定")
         return
     user_index = db.get(f"user_{user_id}")
