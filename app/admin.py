@@ -33,8 +33,8 @@ async def create(bot, message: types.Message, db):
     user_index = db.get(f"user_{user_id}")
     if user_index is None:
         user_index = {"capital": 0, "interest": 0, "repay": 0, "temp_capital": 0, "unix_time": 0}
-    user_index["capital"] = int(amount)
-    user_index["temp_capital"] = int(amount)
+    user_index["capital"] = float(amount)
+    user_index["temp_capital"] = float(amount)
     user_index["unix_time"] = int(unix_time)
     db.set(f"user_{user_id}", user_index)
     await bot.reply_to(message, f"成功创建债务 {user_id} {amount} {unix_time}")
