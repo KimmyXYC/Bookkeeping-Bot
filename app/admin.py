@@ -45,6 +45,8 @@ async def set_rate(bot, message: types.Message, db):
     rate = message.text.split(" ")[1]
     db.set("rate", int(rate))
     id_list = db.get("index")
+    if id_list is None:
+        id_list = {"id": []}
     for user_id in id_list["id"]:
         user_index = db.get(f"user_{user_id}")
         temp_capital = user_index["temp_capital"]
