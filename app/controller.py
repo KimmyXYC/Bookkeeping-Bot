@@ -36,6 +36,7 @@ class BotRunner(object):
             logger.info("Proxy tunnels are being used!")
 
         await self.bot.set_my_commands([
+            types.BotCommand("help", "查看帮助"),
             types.BotCommand("overview", "查看总览 | /overview [用户名]"),
             types.BotCommand("rate", "查看利率"),
             types.BotCommand("repay", "还款 | /repay [金额]")
@@ -44,6 +45,7 @@ class BotRunner(object):
             types.BotCommand("blind", "绑定用户"),
             types.BotCommand("create", "创建债务"),
             types.BotCommand("set_rate", "设置利率"),
+            types.BotCommand("help", "查看帮助"),
             types.BotCommand("overview", "查看总览"),
             types.BotCommand("rate", "查看利率"),
             types.BotCommand("repay", "还款")
