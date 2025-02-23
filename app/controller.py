@@ -36,9 +36,9 @@ class BotRunner(object):
             logger.info("Proxy tunnels are being used!")
 
         await self.bot.set_my_commands([
-            types.BotCommand("overview", "查看总览"),
+            types.BotCommand("overview", "查看总览 | /overview [用户名]"),
             types.BotCommand("rate", "查看利率"),
-            types.BotCommand("repay", "还款")
+            types.BotCommand("repay", "还款 | /repay [金额]")
         ])
         await self.bot.set_my_commands([
             types.BotCommand("blind", "绑定用户"),
@@ -48,6 +48,22 @@ class BotRunner(object):
             types.BotCommand("rate", "查看利率"),
             types.BotCommand("repay", "还款")
         ], scope=types.BotCommandScopeChat(chat_id=BotSetting.admin_id))
+
+        @bot.message_handler(commands=["start", "help"], chat_types=["private"])
+        async def listen_start_command(message: types.Message):
+            _message = await bot.reply_to(
+                message=message,
+                text=formatting.format_text(
+                    formatting.mbold("🥕 Help"),
+                    formatting.mcode("/overview [用户名] 查看总览"),
+                    formatting.mcode("/rate 查看利率"),
+                    formatting.mcode("/repay [金额] 还款"),
+                    formatting.mlink(
+                        "🍀 Github", "https://github.com/KimmyXYC/Bookkeeping-Bot"
+                    ),
+                ),
+                parse_mode="MarkdownV2",
+            )
 
         @bot.message_handler(commands="blind", chat_types=["private"])
         async def listen_blind_command(message: types.Message):
