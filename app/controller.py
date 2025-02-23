@@ -63,6 +63,7 @@ class BotRunner(object):
                     ),
                 ),
                 parse_mode="MarkdownV2",
+                disable_web_page_preview=True
             )
 
         @bot.message_handler(commands="blind", chat_types=["private"])
