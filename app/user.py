@@ -61,7 +61,10 @@ async def overview(bot, message: types.Message, db):
 
 
 async def output_rate(bot, message: types.Message, db):
-    loan_rate = db.get("rate", 10)
+    loan_rate = db.get("rate")
+    if loan_rate is None:
+        loan_rate = 10
+        db.set("rate", loan_rate)
     await bot.reply_to(message, f"当前利率为 {loan_rate}%")
 
 

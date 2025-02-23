@@ -6,8 +6,12 @@ from app import utils
 
 async def blind(bot, message: types.Message, db):
     try:
-        user_id = message.text.split(" ")[1]
-        user_name = message.text.split(" ")[2]
+        command_args = message.text.split()
+        if len(command_args) != 3:
+            await bot.reply_to(message, "参数错误")
+            return
+        user_id = command_args[1]
+        user_name = command_args[2]
         user_index = db.get("index")
         if user_index is None:
             user_index = {"id":[]}
@@ -27,9 +31,19 @@ async def blind(bot, message: types.Message, db):
 
 
 async def create(bot, message: types.Message, db):
-    user_id = message.text.split(" ")[1]
-    amount = message.text.split(" ")[2]
-    unix_time = message.text.split(" ")[3]
+    command_args = message.text.split()
+    if len(command_args) != 4:
+        await bot.reply_to(message, "参数错误")
+        return
+    user_id = command_args[1]
+    amount = command_args[2]
+    unix_time = command_args[3]
+    id_list = db.get("index")
+    if id_list is None:
+        id_list = {"id": []}
+    if user_id not in id_list["id"]:
+        await bot.reply_to(message, f"用户 {user_id} 未绑定")
+        return
     user_index = db.get(f"user_{user_id}")
     if user_index is None:
         user_index = {"capital": 0, "interest": 0, "repay": 0, "temp_capital": 0, "unix_time": 0}
