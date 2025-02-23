@@ -2,7 +2,6 @@
 # @Time    : 2023/11/18 上午12:18
 # @File    : controller.py
 # @Software: PyCharm
-
 from asgiref.sync import sync_to_async
 from loguru import logger
 from telebot import types
@@ -12,6 +11,7 @@ from telebot.asyncio_helper import ApiTelegramException
 from telebot.asyncio_storage import StateMemoryStorage
 
 from setting.telegrambot import BotSetting
+from app import admin, user
 
 StepCache = StateMemoryStorage()
 
@@ -22,8 +22,9 @@ def sync_to_async_func():
 
 
 class BotRunner(object):
-    def __init__(self):
+    def __init__(self, db):
         self.bot = AsyncTeleBot(BotSetting.token, state_storage=StepCache)
+        self.db = db
 
     async def run(self):
         logger.info("Bot Start")
@@ -34,20 +35,49 @@ class BotRunner(object):
             asyncio_helper.proxy = BotSetting.proxy_address
             logger.info("Proxy tunnels are being used!")
 
-        @bot.message_handler(
-            commands="help", chat_types=["private", "supergroup", "group"]
-        )
-        async def listen_help_command(message: types.Message):
-            _message = await bot.reply_to(
-                message=message,
-                text=formatting.format_text(
-                    formatting.mbold("🥕 Help"),
-                    formatting.mlink(
-                        "🍀 Github", "https://github.com/sudoskys/TelegramBotTemplate"
-                    ),
-                ),
-                parse_mode="MarkdownV2",
-            )
+        await self.bot.set_my_commands([
+            types.BotCommand("overview", "查看总览"),
+            types.BotCommand("rate", "查看利率"),
+            types.BotCommand("repay", "还款")
+        ])
+        await self.bot.set_my_commands([
+            types.BotCommand("blind", "绑定用户"),
+            types.BotCommand("create", "创建债务"),
+            types.BotCommand("set_rate", "设置利率"),
+            types.BotCommand("overview", "查看总览"),
+            types.BotCommand("rate", "查看利率"),
+            types.BotCommand("repay", "还款")
+        ], scope=types.BotCommandScopeChat(chat_id=BotSetting.admin_id))
+
+        @bot.message_handler(commands="blind", chat_types=["private"])
+        async def listen_blind_command(message: types.Message):
+            if message.from_user.id != int(BotSetting.admin_id):
+                return
+            await admin.blind(bot, message, self.db)
+
+        @bot.message_handler(commands="create", chat_types=["private"])
+        async def listen_create_command(message: types.Message):
+            if message.from_user.id != int(BotSetting.admin_id):
+                return
+            await admin.create(bot, message, self.db)
+
+        @bot.message_handler(commands="set_rate", chat_types=["private", "group", "supergroup"])
+        async def listen_set_rate_command(message: types.Message):
+            if message.from_user.id != int(BotSetting.admin_id):
+                return
+            await admin.set_rate(bot, message, self.db)
+
+        @bot.message_handler(commands="overview", chat_types=["private", "group", "supergroup"])
+        async def listen_overview_command(message: types.Message):
+            await user.overview(bot, message, self.db)
+
+        @bot.message_handler(commands="rate", chat_types=["private", "group", "supergroup"])
+        async def listen_rate_command(message: types.Message):
+            await user.output_rate(bot, message, self.db)
+
+        @bot.message_handler(commands="repay", chat_types=["private", "group", "supergroup"])
+        async def listen_repay_command(message: types.Message):
+            await user.repay_money(bot, message, self.db)
 
         try:
             await bot.polling(

@@ -1,5 +1,6 @@
 import asyncio
 import sys
+import elara
 
 from dotenv import load_dotenv
 from loguru import logger
@@ -23,10 +24,11 @@ logger.add(
 )
 
 logger.info("Log Is Secret, Please Don't Share It To Others")
+db = elara.exe(path="conf_dir/db.db", commitdb=True)
 
 
 async def main():
-    await asyncio.gather(BotRunner().run())
+    await asyncio.gather(BotRunner(db).run())
 
 
 loop = asyncio.get_event_loop()
