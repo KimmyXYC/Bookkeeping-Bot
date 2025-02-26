@@ -1,5 +1,5 @@
 from telebot import types
-from loguru import logger
+# from loguru import logger /* Make Ruff happy */
 
 from app import utils
 
