@@ -1,5 +1,5 @@
 from telebot import types
-# from loguru import logger // Not needed at the moment
+from loguru import logger
 
 from app import utils
 
@@ -67,6 +67,7 @@ async def output_rate(bot, message: types.Message, db):
         db.set("rate", loan_rate)
     await bot.reply_to(message, f"当前利率为 {loan_rate}%")
 
+
 async def repay_money(bot, message: types.Message, db):
     command_args = message.text.split()
     if len(command_args) != 2:
@@ -97,7 +98,6 @@ async def repay_money(bot, message: types.Message, db):
     repay = user_index["repay"]
     interest = user_index["interest"]
 
-    # 计算经过时间后的复利利息
     hours = (utils.get_unix_time() - user_index["unix_time"]) / 3600
     temp_capital = user_index["temp_capital"]
     interest += utils.calculate_compound_interest(temp_capital, int(loan_rate), hours) - temp_capital
@@ -107,16 +107,11 @@ async def repay_money(bot, message: types.Message, db):
     repay += repay_amount
     user_index["repay"] = repay
 
-    # 计算剩余欠款
-    remaining_debt = capital + interest - repay
-
-    # 如果还款金额超过剩余欠款，认为已还清，利息归0
-    if repay_amount > remaining_debt:
-        user_index["temp_capital"] = 0  # 如果已还清，清空临时资本
-        user_index["repay"] = capital + interest  # 还款已完成，更新已还款金额
+    if repay_amount > capital + interest - repay:
+        user_index["temp_capital"] = 0
+        user_index["repay"] = capital + interest
         await bot.reply_to(message, f"还款金额 {repay_amount:.2f} USDT, 超过剩余金额, 已还清")
-    else:
-        # 如果是部分还款，不清空利息
-        db.set(f"user_{user_id}", user_index)
-        await bot.reply_to(message, f"还款成功 {repay_amount:.2f} USDT")
+        return
 
+    db.set(f"user_{user_id}", user_index)
+    await bot.reply_to(message, f"还款成功 {repay_amount:.2f} USDT")
