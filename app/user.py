@@ -101,6 +101,7 @@ async def repay_money(bot, message: types.Message, db):
     hours = (utils.get_unix_time() - user_index["unix_time"]) / 3600
     temp_capital = user_index["temp_capital"]
     interest += utils.calculate_compound_interest(temp_capital, int(loan_rate), hours) - temp_capital
+    user_index["interest"] = interest
     user_index["temp_capital"] = utils.calculate_compound_interest(temp_capital, int(loan_rate), hours)
     user_index["unix_time"] = utils.get_unix_time()
 
