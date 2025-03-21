@@ -57,6 +57,9 @@ async def create(bot, message: types.Message, db):
 
 async def set_rate(bot, message: types.Message, db):
     rate = message.text.split(" ")[1]
+    original_rate = db.get("rate")
+    if original_rate is None:
+        original_rate = 10
     db.set("rate", float(rate))
     id_list = db.get("index")
     if id_list is None:
@@ -65,8 +68,8 @@ async def set_rate(bot, message: types.Message, db):
         user_index = db.get(f"user_{user_id}")
         temp_capital = user_index["temp_capital"]
         hours = (utils.get_unix_time() - user_index["unix_time"])/3600
-        user_index["interest"] += utils.calculate_compound_interest(temp_capital, float(rate), hours) - temp_capital
-        user_index["temp_capital"] = utils.calculate_compound_interest(temp_capital, float(rate), hours)
+        user_index["interest"] += utils.calculate_compound_interest(temp_capital, float(original_rate), hours) - temp_capital
+        user_index["temp_capital"] = utils.calculate_compound_interest(temp_capital, float(original_rate), hours)
         user_index["unix_time"] = utils.get_unix_time()
         db.set(f"user_{user_id}", user_index)
     await bot.reply_to(message, f"成功设置利率为 {rate}%, 并计算了利息")
