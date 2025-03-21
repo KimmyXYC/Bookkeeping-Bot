@@ -57,7 +57,7 @@ async def create(bot, message: types.Message, db):
 
 async def set_rate(bot, message: types.Message, db):
     rate = message.text.split(" ")[1]
-    db.set("rate", int(rate))
+    db.set("rate", float(rate))
     id_list = db.get("index")
     if id_list is None:
         id_list = {"id": []}
