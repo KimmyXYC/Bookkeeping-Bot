@@ -25,7 +25,7 @@ async def overview(bot, message: types.Message, db):
 
             hours = (utils.get_unix_time() - user_index["unix_time"])/3600
             temp_capital = user_index["temp_capital"]
-            interest += utils.calculate_compound_interest(temp_capital, int(loan_rate), hours) - temp_capital
+            interest += utils.calculate_compound_interest(temp_capital, float(loan_rate), hours) - temp_capital
 
             total_capital += capital
             total_interest += interest
@@ -51,7 +51,7 @@ async def overview(bot, message: types.Message, db):
 
         hours = (utils.get_unix_time() - user_index["unix_time"]) / 3600
         temp_capital = user_index["temp_capital"]
-        interest += utils.calculate_compound_interest(temp_capital, int(loan_rate), hours) - temp_capital
+        interest += utils.calculate_compound_interest(temp_capital, float(loan_rate), hours) - temp_capital
 
         await bot.reply_to(message, f"用户: {user_name} {user_id}\n"
                                     f"本金: {capital:.2f} USDT\n"
@@ -100,9 +100,9 @@ async def repay_money(bot, message: types.Message, db):
 
     hours = (utils.get_unix_time() - user_index["unix_time"]) / 3600
     temp_capital = user_index["temp_capital"]
-    interest += utils.calculate_compound_interest(temp_capital, int(loan_rate), hours) - temp_capital
+    interest += utils.calculate_compound_interest(temp_capital, float(loan_rate), hours) - temp_capital
     user_index["interest"] = interest
-    user_index["temp_capital"] = utils.calculate_compound_interest(temp_capital, int(loan_rate), hours)
+    user_index["temp_capital"] = utils.calculate_compound_interest(temp_capital, float(loan_rate), hours)
     user_index["unix_time"] = utils.get_unix_time()
 
     repay += repay_amount
