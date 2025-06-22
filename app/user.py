@@ -108,7 +108,7 @@ async def repay_money(bot, message: types.Message, db):
     repay += repay_amount
     user_index["repay"] = repay
 
-    if repay_amount > capital + interest - repay:
+    if capital + interest - repay <= 0:
         user_index["temp_capital"] = 0
         user_index["repay"] = capital + interest
         await bot.reply_to(message, f"还款金额 {repay_amount:.2f} USDT, 超过剩余金额, 已还清")
